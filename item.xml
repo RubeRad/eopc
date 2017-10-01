@@ -1,31 +1,31 @@
 	<item>
-		<title>Luke 6:27-34</title>
-		<link>http://escondido-opc.org/ghost/sermons/luke-627-34/</link>
-		<pubDate>Fri, 29 Sep 2017 16:03:31 +0000</pubDate>
+		<title>PASSAGE_HERE</title>
+		<link>http://escondido-opc.org/ghost/sermons/SHORT_HERE</link>
+		<pubDate>Fri, 29 Sep 2017 TIME_HERE +0000</pubDate>
 		<dc:creator><![CDATA[lbaugh]]></dc:creator>
-		<guid isPermaLink="false">http://escondido-opc.org/ghost/?post_type=wpfc_sermon&#038;p=8969</guid>
+		<guid isPermaLink="false">http://escondido-opc.org/ghost/?post_type=wpfc_sermon&#038;p=UNUM_HERE</guid>
 		<description></description>
 		<content:encoded><![CDATA[]]></content:encoded>
 		<excerpt:encoded><![CDATA[]]></excerpt:encoded>
-		<wp:post_id>8969</wp:post_id>
-		<wp:post_date><![CDATA[2017-09-29 16:03:31]]></wp:post_date>
-		<wp:post_date_gmt><![CDATA[2017-09-29 16:03:31]]></wp:post_date_gmt>
+		<wp:post_id>UNUM_HERE</wp:post_id>
+		<wp:post_date><![CDATA[2017-09-29 TIME_HERE]]></wp:post_date>
+		<wp:post_date_gmt><![CDATA[2017-09-29 TIME_HERE]]></wp:post_date_gmt>
 		<wp:comment_status><![CDATA[closed]]></wp:comment_status>
 		<wp:ping_status><![CDATA[closed]]></wp:ping_status>
-		<wp:post_name><![CDATA[luke-627-34]]></wp:post_name>
-		<wp:status><![CDATA[publish]]></wp:status>
+		<wp:post_name><![CDATA[SHORT_HERE]]></wp:post_name>
+		<wp:status><![CDATA[publish]]></wp:status>/
 		<wp:post_parent>0</wp:post_parent>
 		<wp:menu_order>0</wp:menu_order>
 		<wp:post_type><![CDATA[wpfc_sermon]]></wp:post_type>
 		<wp:post_password><![CDATA[]]></wp:post_password>
 		<wp:is_sticky>0</wp:is_sticky>
-		<category domain="wpfc_sermon_series" nicename="luke"><![CDATA[Luke]]></category>
-		<category domain="wpfc_bible_book" nicename="luke"><![CDATA[Luke]]></category>
-		<category domain="wpfc_sermon_topics" nicename="new-testament"><![CDATA[New Testament]]></category>
-		<category domain="wpfc_preacher" nicename="zack-keele"><![CDATA[Zack Keele]]></category>
+		<category domain="wpfc_sermon_series" nicename="BOOK_LC"><![CDATA[BOOK]]></category>
+		<category domain="wpfc_bible_book" nicename="BOOK_LC"><![CDATA[BOOK]]></category>
+		<category domain="wpfc_sermon_topics" nicename="TEST"><![CDATA[TESTAMENT]]></category>
+		<category domain="wpfc_preacher" nicename="NAME_LC"><![CDATA[NAME]]></category>
 		<wp:postmeta>
 			<wp:meta_key><![CDATA[sermon_date]]></wp:meta_key>
-			<wp:meta_value><![CDATA[1506701011]]></wp:meta_value>
+			<wp:meta_value><![CDATA[BIGINT_HERE]]></wp:meta_value>
 		</wp:postmeta>
 		<wp:postmeta>
 			<wp:meta_key><![CDATA[_edit_last]]></wp:meta_key>
@@ -109,11 +109,11 @@
 		</wp:postmeta>
 		<wp:postmeta>
 			<wp:meta_key><![CDATA[bible_passage]]></wp:meta_key>
-			<wp:meta_value><![CDATA[Luke 6:27-36]]></wp:meta_value>
+			<wp:meta_value><![CDATA[PASSAGE_HERE]]></wp:meta_value>
 		</wp:postmeta>
 		<wp:postmeta>
 			<wp:meta_key><![CDATA[sermon_description]]></wp:meta_key>
-			<wp:meta_value><![CDATA[Description]]></wp:meta_value>
+			<wp:meta_value><![CDATA[A Sermon at EOPC]]></wp:meta_value>
 		</wp:postmeta>
 		<wp:postmeta>
 			<wp:meta_key><![CDATA[sermon_audio_id]]></wp:meta_key>
@@ -121,7 +121,7 @@
 		</wp:postmeta>
 		<wp:postmeta>
 			<wp:meta_key><![CDATA[sermon_audio]]></wp:meta_key>
-			<wp:meta_value><![CDATA[http://escondidoopc.org/sites/default/files/sermons/sermon_Luke6v27-36_Keele.mp3]]></wp:meta_value>
+			<wp:meta_value><![CDATA[MP3_URL_HERE]]></wp:meta_value>
 		</wp:postmeta>
 		<wp:postmeta>
 			<wp:meta_key><![CDATA[sermon_notes_id]]></wp:meta_key>

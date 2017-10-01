@@ -1,13 +1,13 @@
 #! /usr/bin/perl
 
-use lib "/home/tina/bin";
+use lib "$ENV{HOME}/bin";
 use Rube;
 
 
 $PRE = Rube::slurp( "pre.xml");
 @ITM = Rube::slurp("item.xml");
 $PST = Rube::slurp("post.xml");
-$mp3dir = "http://escondidoopc.org/sites/default/files/sermons";
+$mp3dir = "http://escondidoopc.org/sites/default/files/sermons/sermon_";
 
 sub correct_name_book {
   
@@ -25,12 +25,16 @@ sub correct_name_book {
 }
 
 
-#print $PRE;
+print $PRE;
+
+$unum = 8999;
+$bigint = 1506702000;
 
 while (<>) {
   $mp3 = m!sermon_(.*mp3)!;
   $mp3 = $1;
-  $mp3url = "$mp3dir/$mp3";
+  $mp3url = $mp3dir . $mp3;
+  ($short=$mp3) =~ s!\.mp3!!;
 
 
   if ($mp3 eq 'Deut4v25-40_and_Deut30_keele.mp3') {
@@ -41,10 +45,10 @@ while (<>) {
     $chp2 = 30;
     $name = 'Keele';
     correct_name_book($name, $book);
-    $psg = 'Deut 4:25-40; Deut 30';
+    $passage = 'Deut 4:25-40; Deut 30';
   } elsif ($mp3 eq 'Ezra1_Ezra6v13-22_Nehemiah13v30-31_keele.mp3') {
     $book = 'Ezra;Nehemiah';
-    $psg = 'Ezra-Nehemiah';
+    $passage = 'Ezra-Nehemiah';
     $name = 'Keele';
   } elsif ($mp3 eq 'Jeremiah22v1-23-23-8_Keele.mp3') {
     $book = 'Jeremiah';
@@ -54,7 +58,7 @@ while (<>) {
     $vend = 8;
     $name = 'Keele';
     correct_name_book($name, $book);
-    $psg = 'Jeremiah 22:1-23:8';
+    $passage = 'Jeremiah 22:1-23:8';
   } elsif ($mp3 eq 'Matt3v1-2_4v17_keele_0.mp3') {
     $book = 'Matt';
     $chp1 = 3;
@@ -64,7 +68,7 @@ while (<>) {
     $vers = 17;
     $name = 'Keele';
     correct_name_book($name, $book);
-    $psg = 'Matt 3:1-2; Matt 4:17';
+    $passage = 'Matt 3:1-2; Matt 4:17';
   } elsif ($mp3 =~ m!^(\d*\w+?)(\d+)v(\d+)\-(\d+)_(\w+)\.mp3!) {
     $book = $1;
     $chap = $2;
@@ -72,7 +76,7 @@ while (<>) {
     $vend = $4;
     $name = $5;
     correct_name_book($name, $book);
-    $psg = "$book $chap:$vbeg-$vend";
+    $passage = "$book $chap:$vbeg-$vend";
   } elsif ($mp3 =~ m!^(\d*\w+?)(\d+)v(\d+)\-(\d+)v(\d+)_(\w+)\.mp3!) {
     $book = $1;
     $chp1 = $2;
@@ -81,27 +85,27 @@ while (<>) {
     $vend = $5;
     $name = $6;
     correct_name_book($name, $book);
-    $psg = "$book $chp1:$vbeg-$chp2:$vend";
+    $passage = "$book $chp1:$vbeg-$chp2:$vend";
   } elsif ($mp3 =~ m!^(\d*\w+?)(\d+)v(\d+)_(\w+)\.mp3!) {
     $book = $1;
     $chap = $2;
     $vers = $3;
     $name = $4;
     correct_name_book($name, $book);
-    $psg = "$book $chap:$vers";
+    $passage = "$book $chap:$vers";
   } elsif ($mp3 =~ m!^(\d*\w+?)(\d+)\-(\d+)_(\w+)\.mp3!) {
     $book = $1;
     $chp1 = $2;
     $chp2 = $3;
     $name = $4;
     correct_name_book($name, $book);
-    $psg = "$book $chp1-$chp2";
+    $passage = "$book $chp1-$chp2";
   } elsif ($mp3 =~ m!^(\d*\w+?)(\d+)_(\w+)\.mp3!) {
     $book = $1;
     $chap = $2;
     $name = $3;
     correct_name_book($name, $book);
-    $psg = "$book $chap";
+    $passage = "$book $chap";
   } elsif ($mp3 =~ m!^(\d*\w+?)(\d+)v(\d+)\-(\d+)\-(Keele)\.mp3!) {
     $book = $1;
     $chap = $2;
@@ -109,7 +113,7 @@ while (<>) {
     $vend = $4;
     $name = $5;
     correct_name_book($name, $book);
-    $psg = "$book $chap:$vbeg-$vend";
+    $passage = "$book $chap:$vbeg-$vend";
   } elsif ($mp3 =~ m!^(\d*\w+?)(\d+)v(\d+)\-(\d+)\.mp3!) {
     $book = $1;
     $chap = $2;
@@ -117,7 +121,7 @@ while (<>) {
     $vend = $4;
     $name = 'Keele';
     correct_name_book($name, $book);
-    $psg = "$book $chap:$vbeg-$vend";
+    $passage = "$book $chap:$vbeg-$vend";
   } elsif ($mp3 =~ m!^(\d*\w+?)(\d+)v(\d+)\-(\d+)v(\d+)\.mp3!) {
     $book = $1;
     $chp1 = $2;
@@ -126,38 +130,63 @@ while (<>) {
     $vend = $5;
     $name = 'Keele';
     correct_name_book($name, $book);
-    $psg = "$book $chp1:$vbeg-$chp2:$vend";
+    $passage = "$book $chp1:$vbeg-$chp2:$vend";
   } else {
     print "Can't parse $mp3\n";
   }
 
   
 
-  printf "%-30s %-15s $mp3\n", $psg, $name;
+  #printf "%-30s %-15s $mp3\n", $passage, $name;
 
 
   
   $namect{$name}++;
   $bookct{$book}++;
 
-  @item = @ITM;
-  for (@item) {
-    
-
-
+  $unum++;
+  $nsec++;
+  $bigint++;
+  $time = sprintf "12:%02d:%02d", int($nsec/60), $nsec%60;
+  $book_lc = lc($book);
+  $name_lc = lc($name);
+  if ($book=~m!Mat|Mar|Luk|Joh|Act|Rom|Cor|Gal|Eph|Phi|Col|Thes|Tim|Heb|Pet|Jam|Rev!) {
+    $testament = 'New Testament';
+    $test      = 'new-testament';
+  } else {
+    $testament = 'Old Testament';
+    $test      = 'old-testament';
   }
 
-  #for (@item) { print }
+  @item = @ITM;
+  for (@item) {
+    #print STDERR "Line is : $_";
+    next if (s!PASSAGE_HERE!$passage!);
+    next if   (s!SHORT_HERE!$short!);
+    next if    (s!TIME_HERE!$time!);
+    next if    (s!UNUM_HERE!$unum!);
+    next if      (s!BOOK_LC!$book_lc! &&
+                     s!BOOK!$book!);
+    next if    (s!TESTAMENT!$testament! &&
+                     s!TEST!$test!);
+    next if      (s!NAME_LC!$name_lc! &&
+                     s!NAME!$name!);
+    next if  (s!BIGINT_HERE!$bigint!);
+    next if (s!MP3_URL_HERE!$mp3url!);
+  }
+
+  for (@item) { print }
 }
 
-print "Names:\n";
+
+#print "Names:\n";
 for (sort keys %namect) {
-  print "$namect{$_}\t$_\n";
+  #print "$namect{$_}\t$_\n";
 }
 
-print "\n\nBooks:\n";
+#print "\n\nBooks:\n";
 for (sort keys %bookct) {
-  print "$bookct{$_}\t$_\n";
+  #print "$bookct{$_}\t$_\n";
 }
 
-#print $PST;
+print $PST;
