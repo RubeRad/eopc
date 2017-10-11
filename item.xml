@@ -1,15 +1,15 @@
 	<item>
 		<title>PASSAGE_HERE</title>
 		<link>http://escondido-opc.org/ghost/sermons/SHORT_HERE</link>
-		<pubDate>Fri, 29 Sep 2017 TIME_HERE +0000</pubDate>
+		<pubDate>WDAY_DD_MMM_YYYY_HERE TIME_HERE +0000</pubDate>
 		<dc:creator><![CDATA[lbaugh]]></dc:creator>
 		<guid isPermaLink="false">http://escondido-opc.org/ghost/?post_type=wpfc_sermon&#038;p=UNUM_HERE</guid>
 		<description></description>
 		<content:encoded><![CDATA[]]></content:encoded>
 		<excerpt:encoded><![CDATA[]]></excerpt:encoded>
 		<wp:post_id>UNUM_HERE</wp:post_id>
-		<wp:post_date><![CDATA[2017-09-29 TIME_HERE]]></wp:post_date>
-		<wp:post_date_gmt><![CDATA[2017-09-29 TIME_HERE]]></wp:post_date_gmt>
+		<wp:post_date><![CDATA[YYYY_MM_DD_HERE TIME_HERE]]></wp:post_date>
+		<wp:post_date_gmt><![CDATA[YYYY_MM_DD_HERE TIME_HERE]]></wp:post_date_gmt>
 		<wp:comment_status><![CDATA[closed]]></wp:comment_status>
 		<wp:ping_status><![CDATA[closed]]></wp:ping_status>
 		<wp:post_name><![CDATA[SHORT_HERE]]></wp:post_name>

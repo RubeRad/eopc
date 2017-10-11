@@ -1,5 +1,6 @@
 #! /usr/bin/perl
 
+use Date::Parse;
 use lib "$ENV{HOME}/bin";
 use Rube;
 
@@ -10,7 +11,6 @@ $PST = Rube::slurp("post.xml");
 $mp3dir = "http://escondidoopc.org/sites/default/files/sermons/sermon_";
 
 sub correct_name_book {
-  
   if ($_[0] =~ /keele/i)     { $_[0] = 'Keele' }
   if ($_[0] =~ /vandrunen/i) { $_[0] = 'VanDrunen' }
   if ($_[0] =~ /baugh/i)     { $_[0] = 'Baugh' }
@@ -24,6 +24,60 @@ sub correct_name_book {
   if ($_[1] =~ /genesis/i)   { $_[1] = 'Gen' }
 }
 
+open DATE, "sermon_dates.txt";
+while (<DATE>) {
+  next if /DATE CLASH/;
+  m!(.*?)\s+([\d-]{10}) ([ap]m)!;
+  $psg = $1;
+  $dateof{$psg} = $2;
+  $ampmof{$psg} = $3;
+}
+
+sub find_date_of {
+  my $psg = shift;
+  my $dt = '';
+  my $ap = '';
+  my $tmp = '';
+  if (exists $dateof{$psg}) {
+    $dt = $dateof{$psg};
+    $ap = $ampmof{$psg};
+  }
+
+  if ($dt eq '') {
+    ($tmp = $psg) =~ s!-.*!!;
+    if (exists($dateof{$tmp})) {
+      $dt = $dateof{$tmp};
+      $ap = $ampmof{$tmp};
+    }
+  }
+
+  if ($dt eq '') {
+    ($tmp = $psg) = s!:.*!!;
+    if (exists($dateof{$tmp})) {
+      $dt = $dateof{$tmp};
+      $ap = $ampmof{$tmp};
+    }
+  }
+
+  if ($dt eq '') {
+    print STDERR "Can't find date for $psg\n";
+    $nsec++;
+    $time = sprintf "12:%02d:%02d", int($nsec/60), $nsec%60;
+    $sdate = "2000-01-02";
+    $ldate = "Sun, 2 Jan 2000";
+  } else {
+    $sdate = $dt;
+    ($yyyy, $mon, $day) = (split /-/, $sdate);
+    $ldate = sprintf "Sun, $day %s $yyyy",
+      ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']->[$mon];
+    if ($ampm eq 'pm') { $time = "18:00:00" }
+    else               { $time = "10:00:00" }
+  }
+
+  return ($sdate, $ldate, $time);
+}
+
 
 print $PRE;
 
@@ -31,7 +85,8 @@ $unum = 8999;
 $bigint = 1506702000;
 
 while (<>) {
-  $mp3 = m!sermon_(.*mp3)!;
+  s!\s+$!!;
+  next unless m!sermon_(.*mp3)!;
   $mp3 = $1;
   $mp3url = $mp3dir . $mp3;
   ($short=$mp3) =~ s!\.mp3!!;
@@ -144,10 +199,10 @@ while (<>) {
   $namect{$name}++;
   $bookct{$book}++;
 
+  ($shortdate, $longdate, $time) = find_date_of($passage);
+
   $unum++;
-  $nsec++;
   $bigint++;
-  $time = sprintf "12:%02d:%02d", int($nsec/60), $nsec%60;
   $book_lc = lc($book);
   $name_lc = lc($name);
   if ($book=~m!Mat|Mar|Luk|Joh|Act|Rom|Cor|Gal|Eph|Phi|Col|Thes|Tim|Heb|Pet|Jam|Rev!) {
@@ -160,7 +215,11 @@ while (<>) {
 
   @item = @ITM;
   for (@item) {
-    #print STDERR "Line is : $_";
+      #print STDERR "Line is : $_";
+    next if (s!WDAY_DD_MMM_YYYY_HERE!$longdate! &&
+	     s!TIME_HERE!$time!);
+    next if (s!YYYY_MM_DD_HERE!$shortdate! &&
+	     s!TIME_HERE!$time!);
     next if (s!PASSAGE_HERE!$passage!);
     next if   (s!SHORT_HERE!$short!);
     next if    (s!TIME_HERE!$time!);
