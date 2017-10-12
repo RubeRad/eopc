@@ -6,8 +6,12 @@ use Date::Parse;
 while (<>) {
   s!\s+$!!;  # remove trailing whitespace
 
+  if (/1 Sam/) {
+    $stophere = 1;
+  }
+
   # Quick skips
-  next if m!^\d+\s+!;   # skip number-only lines = hymns
+  next if m!^\d+\s+$!;  # skip number-only lines = hymns
   next if m!^From \d+!; # From 34534523451
   next if m!^0in 0!;    # 0in 0
   next if m!^Jun 23!;   # spurious date looks like book chapter
@@ -42,6 +46,10 @@ while (<>) {
     $firstverse =~ s!Num !Numbers !;
     $firstverse =~ s!Ps !Psalm !;
     $firstverse =~ s![Pp]hil !Philippians !;
+    $firstverse =~ s!Ezek !Ezekiel !;
+    $firstverse =~ s!Cor !Corinthians !;
+    $firstverse =~ s!Sam !Samuel !;
+    $firstverse =~ s!Tim !Timothy !;
     if (exists($sundayaft{$firstverse})) {
       $prv = $sundayaft{$firstverse};
       $new = $date;
@@ -57,6 +65,7 @@ while (<>) {
 }
 
 for $psg (sort keys %emaildate) {
-  printf "%-20s $sundayaft{$psg} $serviceof{$psg}\t$emaildate{$psg}\n", $psg;
+  ($p = $psg) =~ s!^(\d) !\1!;
+  printf "%-20s $sundayaft{$psg} $serviceof{$psg}\t$emaildate{$psg}\n", $p;
 }
 

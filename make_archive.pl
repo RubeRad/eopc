@@ -38,13 +38,20 @@ sub find_date_of {
   my $dt = '';
   my $ap = '';
   my $tmp = '';
+
+  $psg =~ s!Ecc\b!Ecclesiasties!;
+  $psg =~ s!Eph\b!Ephesians!;
+  if ($psg =~ 'Isaiah 26') {
+      $stophere=1;
+  }
+  
   if (exists $dateof{$psg}) {
     $dt = $dateof{$psg};
     $ap = $ampmof{$psg};
   }
 
   if ($dt eq '') {
-    ($tmp = $psg) =~ s!-.*!!;
+    ($tmp = $psg) =~ s!-.*!!;    # Book C:V-V-->Book C:V
     if (exists($dateof{$tmp})) {
       $dt = $dateof{$tmp};
       $ap = $ampmof{$tmp};
@@ -52,7 +59,15 @@ sub find_date_of {
   }
 
   if ($dt eq '') {
-    ($tmp = $psg) = s!:.*!!;
+    ($tmp = $psg) =~ s!:.*!!;     # Book C:V-V-->Book C
+    if (exists($dateof{$tmp})) {
+      $dt = $dateof{$tmp};
+      $ap = $ampmof{$tmp};
+    }
+  }
+
+  if ($dt eq '') {
+    $tmp = $psg . ":1";          # Book C --> Book C:1
     if (exists($dateof{$tmp})) {
       $dt = $dateof{$tmp};
       $ap = $ampmof{$tmp};
