@@ -11,9 +11,9 @@ $PST = Rube::slurp("post.xml");
 $mp3dir = "http://escondidoopc.org/sites/default/files/sermons/sermon_";
 
 sub correct_name_book {
-  if ($_[0] =~ /keele/i)     { $_[0] = 'Keele' }
-  if ($_[0] =~ /vandrunen/i) { $_[0] = 'VanDrunen' }
-  if ($_[0] =~ /baugh/i)     { $_[0] = 'Baugh' }
+  if ($_[0] =~ /keele/i)     { $_[0] = 'Rev. Zach Keele' }
+  if ($_[0] =~ /vandrunen/i) { $_[0] = 'Rev. David VanDrunen' }
+  if ($_[0] =~ /baugh/i)     { $_[0] = 'Rev. Steve Baugh' }
   $_[0] = ucfirst($_[0]);
 
   if ($_[1] eq 'Number')     { $_[1] = 'Numbers' }
@@ -24,7 +24,7 @@ sub correct_name_book {
   if ($_[1] =~ /genesis/i)   { $_[1] = 'Gen' }
 }
 
-open DATE, "sermon_dates.txt";
+open DATE, "lotta_dates.txt";
 while (<DATE>) {
   next if /DATE CLASH/;
   m!(.*?)\s+([\d-]{10}) ([ap]m)!;
@@ -41,7 +41,7 @@ sub find_date_of {
 
   $psg =~ s!Ecc\b!Ecclesiasties!;
   $psg =~ s!Eph\b!Ephesians!;
-  if ($psg =~ 'Isaiah 26') {
+  if ($psg =~ 'Samuel 10') {
       $stophere=1;
   }
   
@@ -68,6 +68,29 @@ sub find_date_of {
 
   if ($dt eq '') {
     $tmp = $psg . ":1";          # Book C --> Book C:1
+    if (exists($dateof{$tmp})) {
+      $dt = $dateof{$tmp};
+      $ap = $ampmof{$tmp};
+    }
+  }
+
+  if ($dt eq '') {
+    ($tmp = $psg) =~ s!Samuel!Sam!;
+    $tmp =~ s!Tim\w+!Tim!;
+    $tmp =~ s!Hab\w+!Habb!;
+    $tmp =~ s!Jer\w+!Jer!;
+    $tmp =~ s!Lam\w+!Lam!;
+    $tmp =~ s!Lev\w+!Lev!;
+    $tmp =~ s!Prov\w+!Prov!;
+    if (exists($dateof{$tmp})) {
+      $dt = $dateof{$tmp};
+      $ap = $ampmof{$tmp};
+    }
+  }
+
+  if ($dt eq '') {
+    ($tmp = $psg) =~ s!Samuel!Sam!;
+    $tmp =~ s!Jer\b!Jeremiah!;
     if (exists($dateof{$tmp})) {
       $dt = $dateof{$tmp};
       $ap = $ampmof{$tmp};
