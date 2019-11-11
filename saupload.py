@@ -1,9 +1,13 @@
+#! /usr/bin/python3.6
+
 from datetime import date, datetime
+import dateutil.parser
 import glob
 import os
 import re
 import sys
 import sermonaudio
+from sermonaudio.node.requests import Node, NodeAPIError
 from sermonaudio.broadcaster.requests import BroadcasterAPIError, Broadcaster
 from sermonaudio.models import SermonEventType
 
@@ -37,7 +41,7 @@ def osis_passage(p):
       return '{} {}:{}-{}:{}'.format(osis, chp1, vrs1, chp2, vrs2)
 
    # book 1:2-3
-   mch = re.fullmatch(r'(\d?\w+?)(\d+)v(\d+)-(\d+)', p)
+   mch = re.fullmatch(r'(\d?\w+?)(\d+)\.?v(\d+)-(\d+)', p)
    if mch:
       osis = book2osis(mch.group(1))
       chap = mch.group(2)
@@ -65,9 +69,30 @@ def osis_passage(p):
       return 'EZR 1-10; NEH 1-13'
    if p == 'proverbs':
       return 'PRV 1-31'
+   if p == 'deut4v25-40;deut30':
+      return 'DEU 4:25-40'
+   if p == 'matt3v1-2;matt4v17':
+      return 'MAT 3:1-2'
 
    # else
    raise ValueError('cant understand passage: '+p)
+
+
+def osis2parts(p):
+   mch = re.match(r'(\w+)\s?(\S*)', p)
+   book = mch.group(1)
+   rest = mch.group(2)
+   nums = re.findall(r'\d+', rest)
+   if len(nums)==0:
+      return (book, None, None, None, None)
+   if len(nums)==1:
+      return (book, nums[0], None, None, None)
+   if len(nums)==2:
+      return (book, nums[0], nums[1], None, None)
+   if len(nums)==3:
+      return (book, nums[0], nums[1], nums[0], nums[2])
+   if len(nums)==4:
+      return (book, nums[0], nums[1], nums[2], nums[3])
 
 
 
@@ -86,24 +111,85 @@ with open(sys.argv[0]+'.key') as file:
       sermonaudio.set_api_key(line.rstrip())
       break
 
-mp3s = glob.glob('*/*.mp3')
+
+preacher = {}
+dir = os.path.dirname(sys.argv[0])
+piper = os.path.join(dir, 'rename.pipe')
+with open(piper) as file:
+  for line in file:
+    if re.search('Date unknown for', line):
+       continue
+    words = line.split('|')
+    mp3 = words[8].rstrip()
+    prch = words[5]
+    preacher[mp3] = prch
+    stophere=1
+
+
+mp3s = []
+if len(sys.argv) > 1:
+   for i in range(1,len(sys.argv)):
+      arg = sys.argv[i]
+      if re.search(r'\.mp3$', arg):
+         mp3s.append(arg)
+      else:
+         mp3s.extend(glob.glob(arg+'/*.mp3'))
+else:
+   mp3s = glob.glob('*/*.mp3')
+
+new_sermon = None
 
 for path in mp3s:
    base = os.path.basename(path)
    file, mp3 = os.path.splitext(base)
    if mp3 != '.mp3': raise ValueError("Must be mp3")
 
-   date, ampm, pasg, prch = file.split('_')
+   iso, ampm, pasg, prch = file.split('_')
 
-   if not re.match(r'\d\d\d\d-\d\d-\d\d', date): raise ValueError('Date not formatted correctly')
+   if not re.match(r'\d\d\d\d-\d\d-\d\d', iso): raise ValueError('Date not formatted correctly')
    if not re.match(r'([apx])?m', ampm): raise ValueError('am/pm/xm not formatted correctly')
 
    osis = osis_passage(pasg)
    nice = nice_passage(pasg)
+   preach = preacher[base]
+   d = dateutil.parser.parse(iso).date()
 
-   print('{:20}{:30}{}'.format(osis, nice, pasg))
+   (b, ch1, vs1, ch2, vs2) = osis2parts(osis)
+   #resp = Node.get_sermons(book=b, chapter=ch1, chapter_end=ch2, verse=vs1, verse_end=vs2)
+
+   if   ampm == 'am': typ = SermonEventType.SUNDAY_AM
+   elif ampm == 'pm': typ = SermonEventType.SUNDAY_PM
+   else:              typ = SermonEventType.SUNDAY_SERVICE
+
+
+   print('{:20}{:30}{:15}{}   {}'.format(osis, nice, pasg, preach, d))
 
    stophere=1
+
+   new_sermon = Broadcaster.create_or_update_sermon(
+           accept_copyright=True,
+           full_title=nice,
+           speaker_name=preach,
+           preach_date=d,
+           publish_timestamp=datetime.now(),
+           event_type=typ,
+           language_code="en",
+           sermon_id=None,
+           display_title=nice,
+           subtitle=None,
+           bible_text=nice,
+           more_info_text=None,
+           keywords=None,
+   )
+
+   if new_sermon is None:
+      raise ValueError('Sermon create failed!')
+
+   fullpath = os.path.abspath(path)
+   result = Broadcaster.upload_audio(sermon_id=new_sermon.sermon_id,
+                                     path=fullpath)
+
+   #result = Broadcaster.delete_sermon(new_sermon.sermon_id)
 
 
 
