@@ -161,10 +161,27 @@ for path in mp3s:
    elif ampm == 'pm': typ = SermonEventType.SUNDAY_PM
    else:              typ = SermonEventType.SUNDAY_SERVICE
 
+   # make sure a few preachers match labels in sermonaudio
+   if re.search(r'Fesko',   preach):
+      preach = 'John V. Fesko'
+   if re.search(r'Clawson', preach):
+      preach = 'Douglas Clawson'
+   if re.search(r'Ee',      preach):
+      preach = 'Josh Van Ee'
+   if re.search(r'Lazz',    preach):
+      preach = 'Nic Lazzareschi'
+
 
    print('{:20}{:30}{:15}{}   {}'.format(osis, nice, pasg, preach, d))
 
    stophere=1
+
+   upload = False
+   if b == 'EST' or b == '1JN' or b == '2JN' or b == '3JN':
+      upload = False
+   if not upload:
+      continue
+
 
    new_sermon = Broadcaster.create_or_update_sermon(
            accept_copyright=True,
