@@ -127,17 +127,16 @@ def set_api_key():
    with open(fname) as file:
       for line in file:
          key = line.rstrip()
-         print('Found sermonaudio API key in', fname, ': ', key)
+         print('Found sermonaudio API key in', fname)
          sermonaudio.set_api_key(key)
          break
 
 
-def get_date(iso):
+def get_date(iso, svc_str):
    d = dateutil.parser.parse(iso).date()
    # verify sunday
-   if d.weekday() != 6: # 6==sunday
-      confirm('That date is not a Sunday, are you sure?',
-              'Please specify the correct --date')
+   if re.search('SUNDAY', svc_str) and d.weekday() != 6: # 6==sunday
+      die('That date is not a Sunday; please specify the correct --date')
    return d
 
 
@@ -194,10 +193,12 @@ def check_bibref(p):
 
 if __name__ == '__main__':
    parser = argparse.ArgumentParser("Use the sermonaudio API to upload a sermon mp3")
-   parser.add_argument('-s', '--speaker', type=str, help='Speaker full name or nickname from saupload.py.speakers file')
-   parser.add_argument('-d', '--date',    type=str, help='Date in ISO format: YYYY-MM-DD')
+   parser.add_argument('-s',               type=str, help='Speaker nickname from saupload.py.speakers file')
+   parser.add_argument('--speaker',        type=str, help='Full speaker name as it should appear (in quotes)')
+   parser.add_argument('-d', '--date',     type=str, help='Date in ISO format: YYYY-MM-DD')
    parser.add_argument('-a', '--am', action='store_true', help='SUNDAY_AM service type')
    parser.add_argument('-p', '--pm', action='store_true', help='SUNDAY_PM service type')
+   parser.add_argument('-e', '--event',    type=str, help='Sermonaudio event type string')
    parser.add_argument('-b', '--bibref',   type=str, help='Bible passage (as per sermonaudio, no abbreviations')
    parser.add_argument('-t', '--title',    type=str, help='Optional sermon title (default to bibref)')
    parser.add_argument('-u', '--subtitle', type=str, help='Optional sermon subtitle')
@@ -214,28 +215,33 @@ if __name__ == '__main__':
 
    # not defaulting to AM or just SUNDAY_SERVICE, because Christians should worship morning and
    # evening on the Lord's Day. See R. Scott Clark, Recovering the Reformed Confession, ch 8
-   if not args.am and not args.pm:
-      die('Must specify either --am or --pm')
-
-
+   svc_cnt = 0;
    if args.am:
       service = SermonEventType.SUNDAY_AM
       svc_str =                'SUNDAY_AM'
+      svc_cnt += 1
    elif args.pm:
       service = SermonEventType.SUNDAY_PM
       svc_str =                'SUNDAY_PM'
+      svc_cnt += 1
    else:
-      die('ERROR: Cannot specify both AM and PM')
+      svc_str = args.event
+      svc_cnt += 1
+   if svc_cnt != 1:
+      die('ERROR: specify event type with exactly one switch --am --pm or --event ')
 
 
    # make sure the date is a sunday
-   d = get_date(args.date)
+   d = get_date(args.date, svc_str)
 
 
    # fetch full speaker name from saupload.py.speakers in case --speaker nickname
-   if not args.speaker:
-      args.speaker = 'pastor' # default to nickname 'pastor'
-   speaker = get_full_speaker(args.speaker)
+   if args.speaker:            # if caller provided a full name
+      speaker = args.speaker   # use it
+   else:                       # otherwise try to resolve a nickname
+      if not args.s:
+         args.s = 'pastor' # default to nickname 'pastor'
+      speaker = args.speaker = get_full_speaker(args.s)
 
 
    # make sure the passage does not abbreviate the book
