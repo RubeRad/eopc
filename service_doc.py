@@ -38,6 +38,33 @@ def fetch_esv(ref):
 
     return(passage)
 
+
+def fetch_tph(ref):
+    url = 'https://hymnary.org/hymn/TPH2018/'
+    # TBD parse verse numbers like 123v1-3
+    url += ref
+    #print(url)
+    html = requests.get(url)
+
+    mch = re.search(r'<div id="text">(.*?)</div>', html.text, re.DOTALL)
+    if mch:
+        lyr = mch.group(1)
+        # Remove ^A (\x01) and ^M (\r or \x0D)
+        lyr = re.sub(r'[\x01\r]', '', lyr)
+        lyr = re.sub(r'<p>', '', lyr)
+        lyr = re.sub(r'</p>', '\n', lyr)
+        lyr = re.sub(r'<br />', '', lyr)
+        lyr = re.sub(r'(\d )', r'\n\1', lyr)
+
+        # TBD expand [Refrain]
+        return f'Trinity Psalter Hymnal {ref}{lyr}\n\n'
+
+    else:
+        with open(f'tph{ref}.html', 'w') as out:
+            print(html.text, file=out)
+        return f'{ref}\nNot found online\n'
+    
+
 amliturgy='''CALL
 DOX
 LAWGOSPEL
@@ -217,11 +244,12 @@ txt = re.sub('TH11', th11, txt)
 
 for ref in args.refs:
     if ref[0] == 'h':
-        txt = re.sub('SONG', f'{ref}\n', txt, count=1)
+        song = fetch_tph(ref[1:])
+        txt = re.sub('SONG', song, txt, count=1)
     else:
         pref = re.sub(r'\+', ' ', ref)
         esv = fetch_esv(ref)
-        all = f'{pref}\n{esv}\n'
+        all = f'{pref}\n{esv}'
         txt = re.sub('ESV', all, txt, count=1)
 
 
