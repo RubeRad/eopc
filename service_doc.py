@@ -13,7 +13,7 @@ def find_non_ascii(txt):
 
 
 def fetch_esv(ref):
-    esv_org_api_key = '6b2ebf6f70b95c12e8aea92c80c9291be673d2d8'
+    esv_org_api_key = 'oopxdontpostthisonline'
     esv_org_api_url = 'https://api.esv.org/v3/passage/text'
 
     hdr = {'Authorization': f'Token {esv_org_api_key}'}
