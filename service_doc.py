@@ -17,7 +17,7 @@ def fetch_esv(ref):
     esv_org_api_url = 'https://api.esv.org/v3/passage/text'
 
     hdr = {'Authorization': f'Token {esv_org_api_key}'}
-    par = {'q' : 'Phil+3:4-10',
+    par = {'q' : ref,
            'include-headings' : False,
            'include-footnotes' : False,
            'include-verse-numbers': False,
@@ -28,8 +28,11 @@ def fetch_esv(ref):
     response = requests.get(esv_org_api_url, params=par, headers=hdr)
     passage  = response.json()['passages'][0]
 
-    # fix "em dashes" -- thx ChatGPT!
-    passage = re.sub('\u2014', ' -- ', passage)
+    # fix unicode characters -- thx ChatGPT!
+    passage = re.sub(r'\u2014', ' -- ', passage) # em dash
+    passage = re.sub(r'\u201C', '"',    passage) # left  ``
+    passage = re.sub(r'\u201D', '"',    passage) # right ''
+    
 
     # check for any other non-printable characters
     non_ascii = find_non_ascii(passage)
@@ -55,6 +58,7 @@ def fetch_tph(ref):
         lyr = re.sub(r'</p>', '\n', lyr)
         lyr = re.sub(r'<br />', '', lyr)
         lyr = re.sub(r'(\d )', r'\n\1', lyr)
+        lyr = re.sub('\u2019', "'", lyr) # too-fancy right single quote
 
         # TBD expand [Refrain]
         return f'Trinity Psalter Hymnal {ref}{lyr}\n\n'
@@ -131,7 +135,7 @@ Amen
 
 '''
 
-apostles = '''Apostle’s Creed
+apostles = '''Apostle's Creed
 
 I believe in God the father almighty,
 Maker of heaven and earth
